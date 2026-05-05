@@ -6,7 +6,8 @@ import Expense from '../models/expense.js';
 const getAllExpenses = async (req, res) => {
   try {
     const expenses = await Expense.findAll();
-    res.status(200).json({expenses});
+
+    res.status(200).json({ expenses });
 
   } 
   catch (err) {
@@ -30,12 +31,13 @@ const getExpenseById = async (req, res) => {
 // POST create expense 
 const createExpense = async (req, res) => {
   try {
-    const { amount, description, category, userId } = req.body;
+    console.log("body received",req.body)
+    const { amount, description, category,userId } = req.body;
     const expense = await Expense.create({ 
       amount, 
       description, 
       category,
-      userId
+      userId:userId
     });
     res.status(201).json({newExpenseDetail:expense});
   } catch (err) {

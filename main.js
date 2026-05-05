@@ -17,14 +17,14 @@ app.use('/expense', expenseRouter);
 app.use('/user',userRouter)
 
 
-db.sync() 
+db.sync()
   .then(() => {
     console.log("database is connected");
     app.listen(4000, (err) => {       
       if (err) {  
         console.log(err)
       } else {
-        console.log('Server is running on port 3000');
+        console.log('Server is running on port 4000');
       }
     });
   })

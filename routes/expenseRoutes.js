@@ -3,16 +3,19 @@
 import express from 'express';
 import expenseController from '../controller/expenseController.js';
 
+import authenticate from '../middleware/auth.js';
+
 const router = express.Router();
 
 
-router.get('/get-expense', expenseController.getAllExpenses);
-router.get('/get-expense/:id', expenseController.getExpenseById);
+router.get('/get-expense', authenticate, expenseController.getAllExpenses);
 
-router.post('/add-expense', expenseController.createExpense);
+router.get('/get-expense/:id',authenticate, expenseController.getExpenseById);
 
-router.put('/edit-expense/:id', expenseController.updateExpense);
+router.post('/add-expense', authenticate,expenseController.createExpense);
 
-router.delete('/delete-expense/:id', expenseController.deleteExpense);
+router.put('/edit-expense/:id', authenticate,expenseController.updateExpense);
+
+router.delete('/delete-expense/:id', authenticate,expenseController.deleteExpense);
 
 export default router;
