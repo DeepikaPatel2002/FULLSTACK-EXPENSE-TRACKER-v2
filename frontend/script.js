@@ -3,7 +3,7 @@
 const expenseForm = document.getElementById('expenseForm');
 const expenseList= document.getElementById('expenseList');
 
-const apiURL='http://localhost:5000/expense';
+const apiURL='http://localhost:4000/expense';
 
 let editId=null;
 
@@ -30,7 +30,8 @@ let editId=null;
         
        amount: document.getElementById('amount').value,
         description :document.getElementById('description').value,
-        category : document.getElementById('category').value
+        category : document.getElementById('category').value,
+        userId: localStorage.getItem('userId')
           
       };
 
@@ -107,7 +108,7 @@ let editId=null;
 
              editId = id;
              document.querySelector('button[type="submit"]').innerText = 'Update Expense';
-            //  li.remove();
+        
         }
 
   });
