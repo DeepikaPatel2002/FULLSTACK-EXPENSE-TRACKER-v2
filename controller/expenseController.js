@@ -1,47 +1,38 @@
 
+const { Expense, User, Category } = require('../models/index.js');
 
-import Expense from '../models/expense.js';
-
-// GET all expenses
+// GET all expenses with associations
 const getAllExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.findAll();
-
+    const expenses = await Expense.findAll({
+      include: [
+        { model: User, attributes: ['id', 'name', 'email'] },
+        { model: Category, attributes: ['id', 'name'] }
+      ]
+    });
     res.status(200).json({ expenses });
-
-  } 
-  catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-};
-
-
-// GET single expense by ID
-const getExpenseById = async (req, res) => {
-  try {
-    const expense = await Expense.findByPk(req.params.id);
-    if (!expense) return res.status(404).json({ error: 'Expense not found' });
-    res.status(200).json(expense);
-  } 
-  catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// POST create expense 
+// POST create expense
 const createExpense = async (req, res) => {
   try {
-    console.log("body received",req.body)
-    const { amount, description, category,userId } = req.body;
-    const expense = await Expense.create({ 
-      amount, 
-      description, 
-      category,
-      userId:userId
+    const { amount, description, category, userId } = req.body;
+
+    // Find or create category dynamically
+    const [categoryRecord] = await Category.findOrCreate({ where: { name: category } });
+
+    const expense = await Expense.create({
+      amount,
+      description,
+      categoryId: categoryRecord.id,
+      userId
     });
-    res.status(201).json({newExpenseDetail:expense});
+
+    res.status(201).json({ newExpenseDetail: expense });
   } catch (err) {
-    console.log(err)
     res.status(500).json({ error: err.message });
   }
 };
@@ -51,11 +42,20 @@ const updateExpense = async (req, res) => {
   try {
     const expense = await Expense.findByPk(req.params.id);
     if (!expense) return res.status(404).json({ error: 'Expense not found' });
+
     const { amount, description, category } = req.body;
-    await expense.update({ amount, description, category });
+
+    // Update category dynamically
+    const [categoryRecord] = await Category.findOrCreate({ where: { name: category } });
+
+    await expense.update({
+      amount,
+      description,
+      categoryId: categoryRecord.id
+    });
+
     res.status(200).json(expense);
-  } 
-  catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
@@ -65,17 +65,16 @@ const deleteExpense = async (req, res) => {
   try {
     const expense = await Expense.findByPk(req.params.id);
     if (!expense) return res.status(404).json({ error: 'Expense not found' });
+
     await expense.destroy();
     res.status(200).json({ message: 'Expense deleted successfully' });
-  } 
-  catch (err) {
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export default {
+module.exports = {
   getAllExpenses,
-  getExpenseById,
   createExpense,
   updateExpense,
   deleteExpense

@@ -1,33 +1,32 @@
 
-import { DataTypes } from 'sequelize';
-import sequelize from '../utils/db-connection.js';
+const { DataTypes } = require('sequelize');
+const sequelize = require('../utils/db-connection.js');
 
 const Expense = sequelize.define('Expense', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
+
+  id: { type: DataTypes.INTEGER, 
+    autoIncrement: true, 
+    primaryKey: true
+   },
+
+  amount: { type: DataTypes.DECIMAL(10,2), 
+    allowNull: false
+   },
+
+  description: { type: DataTypes.STRING, 
+    allowNull: false
+   },
+
+  userId: { type: DataTypes.INTEGER, 
+    allowNull: true 
   },
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: true, 
-  },
-  amount: {
-    type: DataTypes.DECIMAL(10,2),
-    allowNull: false,
-  },
-  description: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  category: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
+
+  categoryId: { type: DataTypes.INTEGER, 
+    allowNull: false 
+  }
 }, {
   tableName: 'expenses',
   timestamps: true,
 });
 
-export default Expense;
-
+module.exports = Expense;

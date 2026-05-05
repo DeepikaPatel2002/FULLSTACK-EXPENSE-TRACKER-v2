@@ -1,16 +1,15 @@
 
-import User from './user.js';
-import Category from './category.js';
-import Expense from './expense.js';
 
+const User = require('./user.js');
+const Category = require('./category.js');
+const Expense = require('./expense.js');
+
+// Associations
 User.hasMany(Expense, { foreignKey: 'userId' });
-Expense.belongsTo(User, { foreignKey: 'userId'});
+Expense.belongsTo(User, { foreignKey: 'userId' });
 
-Category.hasMany(Expense,   { foreignKey: 'categoryId', as: 'expenses' });
-Expense.belongsTo(Category, { foreignKey: 'categoryId', as: 'expenseCategory' });
+Category.hasMany(Expense, { foreignKey: 'categoryId' });
+Expense.belongsTo(Category, { foreignKey: 'categoryId' });
 
-export {
-  User,
-  Category,
-  Expense
-};
+module.exports = { User, Category, Expense };
+

@@ -1,36 +1,24 @@
 
-import express from 'express';
-import cors from 'cors';
-import db from './utils/db-connection.js';
-import expenseRouter from './routes/expenseRoutes.js';
-import './models/index.js';
-import User from './models/user.js'
-import userRouter from './routes/userRoutes.js'
+const express = require('express');
+// const bodyParser = require('body-parser');
+const sequelize = require('./utils/db-connection.js');
+const { User, Category, Expense } = require('./models/index.js');
+const expenseRoutes = require('./routes/expenseRoutes.js');
 
+const cors = require('cors');
 
 const app = express();
-
-app.use(cors());
 app.use(express.json());
 
-app.use('/expense', expenseRouter);
-app.use('/user',userRouter)
 
+app.use(cors());
 
-db.sync()
-  .then(() => {
-    console.log("database is connected");
-    app.listen(4000, (err) => {       
-      if (err) {  
-        console.log(err)
-      } else {
-        console.log('Server is running on port 4000');
-      }
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-     
-  });
- 
+// Routes
+app.use('/expense', expenseRoutes);
 
+// Sync DB with associations
+sequelize.sync()
+  .then(() => console.log("Database synced with associations"))
+  .catch(err => console.error("Error syncing DB", err));
+
+app.listen(4000, () => console.log("Server running on port 4000"));
