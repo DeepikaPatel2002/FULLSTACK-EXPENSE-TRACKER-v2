@@ -1,59 +1,56 @@
 const expenseForm = document.getElementById('expenseForm');
-const expenseList= document.getElementById('expenseList');
-const apiURL='http://localhost:4000/expense';
-let editId=null;
+const expenseList = document.getElementById('expenseList');
+const apiURL = 'http://localhost:4000/expense';
+let editId = null;
 
 // page reload hone par purana data localstorage se nikalna
-window.addEventListener('DOMContentLoaded',async ()=>{
-    try {
-        const response = await axios.get(`${apiURL}/get-expense`);
-        response.data.expenses.forEach(expense => {
-            addNewExpenseToUI(expense);
-        });
-    } catch (err) {
-        console.log('Error fetching data', err);
-    }
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await axios.get(`${apiURL}/get-expense`);
+    response.data.expenses.forEach(expense => {
+      addNewExpenseToUI(expense);
+    });
+  } catch (err) {
+    console.log('Error fetching data', err);
+  }
 });
 
 // form submit hone par new expense add karna
-expenseForm.addEventListener('submit', async (e)=>{
+expenseForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-const expenseDetails = {
-  amount: document.getElementById('amount').value,
-  description: document.getElementById('description').value,
-  category: document.getElementById('category').value, 
-  userId: localStorage.getItem('userId')
-};
+  const expenseDetails = {
+    amount: document.getElementById('amount').value,
+    description: document.getElementById('description').value,
+    category: document.getElementById('category').value
+  };
 
-  
-  console.log("detais being sent:",expenseDetails)
-  try{
-    
+  console.log("detais being sent:", expenseDetails)
 
-    if(editId){
-   const response = await axios.put(`${apiURL}/edit-expense/${editId}`, expenseDetails);
+  try {
 
-   
-   updateExpenseInUI(response.data);
+    if (editId) {
+      const response = await axios.put(`${apiURL}/edit-expense/${editId}`, expenseDetails);
 
-   editId = null;
-   document.querySelector('button[type="submit"]').innerText = "Add Expense";
-} else {
-   const response = await axios.post(`${apiURL}/add-expense`, expenseDetails);
-   addNewExpenseToUI(response.data.newExpenseDetail);
-}
-expenseForm.reset();
+      updateExpenseInUI(response.data);
+
+      editId = null;
+      document.querySelector('button[type="submit"]').innerText = "Add Expense";
+    } else {
+      const response = await axios.post(`${apiURL}/add-expense`, expenseDetails);
+      addNewExpenseToUI(response.data.newExpenseDetail);
+    }
+    expenseForm.reset();
 
   }
 
-  catch(err){
-    console.log("Error saving data",err);
+  catch (err) {
+    console.log("Error saving data", err);
   }
 });
 
 // screen par expense show karna
 function addNewExpenseToUI(expense) {
-  const categoryName = expense.Category?.name || expense.category || expense.categoryId || 'Unknown';
+  const categoryName = expense.Category?.name || 'Unknown';
 
 
   const expenseElement = document.createElement('li');
@@ -83,32 +80,32 @@ function addNewExpenseToUI(expense) {
 
 function updateExpenseInUI(updatedExpense) {
   const expenseElement = document.getElementById(`expense-${updatedExpense.id}`);
-  if(expenseElement){
+  if (expenseElement) {
     expenseElement.querySelector('.amount').innerText = updatedExpense.amount;
     expenseElement.querySelector('.description').innerText = updatedExpense.description;
-    expenseElement.querySelector('.category').innerText = updatedExpense.Category?.name || updatedExpense.categoryId;
+    expenseElement.querySelector('.category').innerText = updatedExpense.Category?.name || 'Unknown';
   }
 }
 
 // delete and edit button
-expenseList.addEventListener('click', async (e)=>{
-   const li = e.target.closest('li');
-   const id = li.getAttribute('data-id');
-   if(e.target.classList.contains('delete-btn')){
-       try{
-          await axios.delete(`${apiURL}/delete-expense/${id}`);
-          li.remove();
-       }
-       catch(err){
-          console.log("Error delteing",err);
-       }
-   }
-   if(e.target.classList.contains('edit-btn')){
-       const textContent =li.firstElementChild.innerText;
-        document.getElementById('amount').value =li.getAttribute('data-amount');
-        document.getElementById('category').value = li.getAttribute('data-category');
-        document.getElementById('description').value = li.getAttribute('data-description');
-       editId = id;
-       document.querySelector('button[type="submit"]').innerText = 'Update Expense';
-   }
+expenseList.addEventListener('click', async (e) => {
+  const li = e.target.closest('li');
+  const id = li.getAttribute('data-id');
+  if (e.target.classList.contains('delete-btn')) {
+    try {
+      await axios.delete(`${apiURL}/delete-expense/${id}`);
+      li.remove();
+    }
+    catch (err) {
+      console.log("Error delteing", err);
+    }
+  }
+  if (e.target.classList.contains('edit-btn')) {
+    const textContent = li.firstElementChild.innerText;
+    document.getElementById('amount').value = li.getAttribute('data-amount');
+    document.getElementById('category').value = li.getAttribute('data-category');
+    document.getElementById('description').value = li.getAttribute('data-description');
+    editId = id;
+    document.querySelector('button[type="submit"]').innerText = 'Update Expense';
+  }
 });

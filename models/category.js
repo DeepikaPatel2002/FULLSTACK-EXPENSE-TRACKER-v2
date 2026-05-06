@@ -5,11 +5,13 @@ const sequelize = require('../utils/db-connection.js');
 const Category = sequelize.define('Category', {
   id: { type: DataTypes.INTEGER, 
     autoIncrement: true, 
-    primaryKey: true },
+    primaryKey: true 
+  },
 
   name: { type: DataTypes.STRING,
      allowNull: false,
-      unique: true }
+      unique: true 
+    }
 }, {
   tableName: 'categories',
   timestamps: true,

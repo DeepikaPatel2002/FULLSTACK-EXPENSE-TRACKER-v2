@@ -6,7 +6,7 @@ const getAllExpenses = async (req, res) => {
   try {
     const expenses = await Expense.findAll({
       include: [
-        { model: User, attributes: ['id', 'name', 'email'] },
+
         { model: Category, attributes: ['id', 'name'] }
       ]
     });
@@ -17,46 +17,62 @@ const getAllExpenses = async (req, res) => {
 };
 
 // POST create expense
+// expenseController.js
 const createExpense = async (req, res) => {
   try {
-    const { amount, description, category, userId } = req.body;
-
-    // Find or create category dynamically
-    const [categoryRecord] = await Category.findOrCreate({ where: { name: category } });
-
-    const expense = await Expense.create({
-      amount,
-      description,
-      categoryId: categoryRecord.id,
-      userId
-    });
-
-    res.status(201).json({ newExpenseDetail: expense });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// PUT update expense
-const updateExpense = async (req, res) => {
-  try {
-    const expense = await Expense.findByPk(req.params.id);
-    if (!expense) return res.status(404).json({ error: 'Expense not found' });
-
     const { amount, description, category } = req.body;
 
-    // Update category dynamically
-    const [categoryRecord] = await Category.findOrCreate({ where: { name: category } });
+    // find or create category
+    const categoryRecord = await Category.findOne({ where: { name: category } });
+    if (!categoryRecord) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
 
-    await expense.update({
+    // create expense
+    const newExpense = await Expense.create({
       amount,
       description,
       categoryId: categoryRecord.id
     });
 
-    res.status(200).json(expense);
+    // fetch with category join
+    const expenseWithCategory = await Expense.findByPk(newExpense.id, {
+      include: [{ model: Category, attributes: ["id", "name"] }]
+    });
+
+    res.json({ newExpenseDetail: expenseWithCategory });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Failed to add expense" });
+  }
+};
+
+
+/// expenseController.js
+const updateExpense = async (req, res) => {
+  try {
+    const { amount, description, category } = req.body;
+    const { id } = req.params;
+
+    // find category record
+    const categoryRecord = await Category.findOne({ where: { name: category } });
+    if (!categoryRecord) {
+      return res.status(400).json({ error: "Invalid category" });
+    }
+
+    // update expense
+    await Expense.update(
+      { amount, description, categoryId: categoryRecord.id },
+      { where: { id } }
+    );
+
+    // fetch updated expense with category join
+    const updatedExpense = await Expense.findByPk(id, {
+      include: [{ model: Category, attributes: ["id", "name"] }]
+    });
+
+    res.json(updatedExpense);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update expense" });
   }
 };
 
