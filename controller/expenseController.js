@@ -17,7 +17,6 @@ const getAllExpenses = async (req, res) => {
 };
 
 // POST create expense
-// expenseController.js
 const createExpense = async (req, res) => {
   try {
     const { amount, description, category } = req.body;
@@ -47,7 +46,7 @@ const createExpense = async (req, res) => {
 };
 
 
-/// expenseController.js
+
 const updateExpense = async (req, res) => {
   try {
     const { amount, description, category } = req.body;
